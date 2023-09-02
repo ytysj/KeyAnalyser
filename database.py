@@ -49,6 +49,7 @@ def add_item(id, key_num, character, key_state, timestamp, last_time):
 #查询单个数据
 def query_item(id):
     global conn, cursor
+    print(f"query_item({id})")
     # 查询"key_analyser"表格中id为"1"的数据。
     # SELECT *表示查询所有字段，FROM key_analyser表示从"key_analyser"表格中进行查询。
     # WHERE id="1"表示查询id为"1"的数据。
@@ -68,14 +69,14 @@ def query_all_item():
         print(row)
 
 if __name__ == "__main__":
-    print("KeyAnalyser is running")
+    print("database module test start")
     init_db()
     
     query_all_item()
 
-    add_item(1, 1, 'a', 0, 1000, 1)
-    add_item(2, 2, 'b', 0, 1000, 1)
-    add_item(3, 3, 'c', 0, 1000, 1)
-    add_item(4, 4, 'd', 0, 1000, 1)
+    add_item(1, 100, 'a', 0, 1000, 1)
+    add_item(2, 101, 'b', 0, 1001, 1)
+    add_item(3, 102, 'c', 0, 1002, 1)
+    add_item(4, 103, 'd', 0, 1003, 1)
     
     query_all_item()
