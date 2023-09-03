@@ -1,4 +1,5 @@
 import sqlite3
+import threading
 
 conn = None
 cursor = None
@@ -8,7 +9,7 @@ def init_db():
     global conn, cursor
     print("init_db")
     # 连接到数据库（如果数据库不存在，则会创建一个新的数据库文件）
-    conn = sqlite3.connect('key_db.db')
+    conn = sqlite3.connect('key_db.db', check_same_thread=False)
     # 创建一个游标对象，用于执行SQL语句
     cursor = conn.cursor()
 
@@ -16,7 +17,7 @@ def init_db():
     # key_num INT类型，按键号码
     # character TEXT类型，按键文字
     # key_state INT类型，按键状态（0：点击，1：长按）
-    # timestamp INT类型，时间戳
+    # timestamp INT类型，时间戳（单位：ms）
     # last_time INT类型，按下持续时间（单位：ms）
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS key_analyser
@@ -33,7 +34,7 @@ def init_db():
 # key_num 按键号码
 # character 按键文字
 # key_state 按键状态（0：点击，1：长按）
-# timestamp 时间戳
+# timestamp 时间戳（单位：ms）
 # last_time 按下持续时间（单位：ms）
 def add_item(id, key_num, character, key_state, timestamp, last_time):
     global conn, cursor
@@ -68,15 +69,28 @@ def query_all_item():
     for row in rows:
         print(row)
 
+def query_max_id():
+    global conn, cursor
+    try:
+        print("query_max_id")
+        cursor.execute("SELECT MAX(id) FROM key_analyser")
+        max_id = cursor.fetchone()[0]
+        print("最大主键值:", max_id)
+        if(max_id==None):
+            max_id = 0
+        return max_id
+    except Exception as e:
+        print(f"query_max_id error!", e)
+
 if __name__ == "__main__":
     print("database module test start")
     init_db()
     
     query_all_item()
 
-    add_item(1, 100, 'a', 0, 1000, 1)
-    add_item(2, 101, 'b', 0, 1001, 1)
-    add_item(3, 102, 'c', 0, 1002, 1)
-    add_item(4, 103, 'd', 0, 1003, 1)
+    add_item(0, 100, 'a', 0, 1000, 1)
+    add_item(1, 101, 'b', 0, 1001, 1)
+    add_item(2, 102, 'c', 0, 1002, 1)
+    add_item(3, 103, 'd', 0, 1003, 1)
     
     query_all_item()
