@@ -3,6 +3,7 @@ import time
 import threading
 import database
 import combined_key
+import log
 
 lock = threading.Lock()     # 创建线程锁
 
@@ -25,9 +26,9 @@ def on_release(key):
             if(combined_key_list!=None):
                 new_key = '+'.join(combined_key_list)
                 key_str = new_key
-                print("按下组合按键:", new_key)
+                log.debug("按下组合按键:", new_key)
         else:
-            print("按下:", key)
+            log.debug("按下:", key)
         
         key_num = 0
         if not isinstance(key, keyboard.KeyCode):   #判断是特殊按键
@@ -35,11 +36,10 @@ def on_release(key):
         else:
             key_num = key.vk
 
-        if(last_time>1000):
+        if(last_time>1000): #根据按下时间判断按键类型
             key_type = 0
         else:
             key_type = 1
-
 
         lock.acquire()      # 获取线程锁
         try:
@@ -48,17 +48,21 @@ def on_release(key):
             cur_id += 1
             del pressed_keys[key]
         except Exception as e:
-            print("数据库操作出错:", e)
+            log.error("数据库操作出错:", e)
         finally:
             lock.release()  # 释放线程锁
 
 if __name__ == "__main__":
-    print("KeyAnalyser is running")
+    log.log_init()
+    log.debug("KeyAnalyser start up")
 
     database.init_db()
-    cur_id = database.query_max_id()
+    cur_id = database.query_max_id()    #获取最大键值
     if(cur_id!=0):
         cur_id += 1
 
+    log.debug("KeyAnalyser is listenning")
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
+
+    log.debug("KeyAnalyser quit")

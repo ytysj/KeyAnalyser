@@ -1,5 +1,5 @@
 import sqlite3
-import threading
+import log
 
 conn = None
 cursor = None
@@ -7,7 +7,7 @@ cursor = None
 #初始化数据库
 def init_db():
     global conn, cursor
-    print("init_db")
+    log.debug("init_db")
     # 连接到数据库（如果数据库不存在，则会创建一个新的数据库文件）
     conn = sqlite3.connect('key_db.db', check_same_thread=False)
     # 创建一个游标对象，用于执行SQL语句
@@ -41,56 +41,49 @@ def add_item(id, key_num, character, key_state, timestamp, last_time):
     try:
         str = "INSERT INTO key_analyser (id, key_num, character, key_state, timestamp, last_time)VALUES "\
             + f"({id}, {key_num}, '{character}', {key_state}, {timestamp}, {last_time})"
-        #print("add_item:", str)
+        #log.debug("add_item:", str)
         cursor.execute(str)
         conn.commit()
     except Exception as e:
-        print(f"add_item({id}) error!", e)
+        log.error(f"add_item({id}) error!", e)
 
 #查询单个数据
 def query_item(id):
     global conn, cursor
-    print(f"query_item({id})")
+    log.debug(f"query_item({id})")
     # 查询"key_analyser"表格中id为"1"的数据。
     # SELECT *表示查询所有字段，FROM key_analyser表示从"key_analyser"表格中进行查询。
     # WHERE id="1"表示查询id为"1"的数据。
     cursor.execute("SELECT * FROM key_analyser WHERE id=?", (id))
     row = cursor.fetchone()
-    print(row)
+    log.debug(row)
 
 #查询所有数据
 def query_all_item():
     global conn, cursor
-    print("query_all_item")
+    log.debug("query_all_item")
     # 查询"key_analyser"表格中的所有数据。
     # SELECT *表示查询所有字段，FROM key_analyser表示从"key_analyser"表格中进行查询。
     cursor.execute("SELECT * FROM key_analyser")
     rows = cursor.fetchall()
     for row in rows:
-        print(row)
+        log.debug(row)
 
 def query_max_id():
     global conn, cursor
     try:
-        print("query_max_id")
+        log.debug("query_max_id")
         cursor.execute("SELECT MAX(id) FROM key_analyser")
         max_id = cursor.fetchone()[0]
-        print("最大主键值:", max_id)
+        #log.debug("最大主键值:", max_id)
         if(max_id==None):
             max_id = 0
         return max_id
     except Exception as e:
-        print(f"query_max_id error!", e)
+        log.error(f"query_max_id error!", e)
 
 if __name__ == "__main__":
     print("database module test start")
     init_db()
-    
-    query_all_item()
-
-    add_item(0, 100, 'a', 0, 1000, 1)
-    add_item(1, 101, 'b', 0, 1001, 1)
-    add_item(2, 102, 'c', 0, 1002, 1)
-    add_item(3, 103, 'd', 0, 1003, 1)
     
     query_all_item()

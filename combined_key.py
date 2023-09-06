@@ -1,5 +1,6 @@
 from pynput import keyboard
 from pynput.keyboard import KeyCode
+import log
 
 #list all combined key
 raw_dict_combined_key = {
@@ -14,7 +15,7 @@ for key, value in raw_dict_combined_key.items():
     dict_combined_key[new_key] = value
 
 def unpack_combined_key(key):
-    # print("unpack_combined_key", key)
+    # log.debug("unpack_combined_key", key)
     if key in dict_combined_key:
         return dict_combined_key[key]
     else:
