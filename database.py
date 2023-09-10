@@ -68,6 +68,7 @@ def query_all_item():
     rows = cursor.fetchall()
     for row in rows:
         log.debug(row)
+    return rows
 
 def query_max_id():
     global conn, cursor
